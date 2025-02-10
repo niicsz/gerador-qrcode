@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code</title>
+</head>
+<body>
+<h1>Gerador de QR Code</h1>
+<form id="qrForm">
+    <label for="texto">Texto para QR Code:</label>
+    <input type="text" id="texto" name="texto" required>
+    <button type="submit">Gerar QR Code</button>
+</form>
+<div>
+    <h2>QR Code Gerado:</h2>
+    <img id="qrcode" src="" alt="QR Code" style="display:none; max-width: 200px;">
+</div>
+<script>
+    document.getElementById('qrForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const texto = document.getElementById('texto').value;
+        const img = document.getElementById('qrcode');
+
+        try {
+            const timestamp = new Date().getTime(); // Evita cache adicionando um timestamp único
+            const response = await fetch(`/gerar-qrcode?texto=${encodeURIComponent(texto)}&t=${timestamp}`);
+
+            if (!response.ok) {
+                throw new Error('Erro ao gerar QR Code');
+            }
+
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+
+            img.src = imageUrl;
+            img.style.display = 'block';
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao gerar o QR Code. Tente novamente.');
+        }
+    });
+</script>
+</body>
+</html>
